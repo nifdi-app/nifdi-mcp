@@ -1,0 +1,16 @@
+name: Feature request
+description: Something the server should be able to do.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you were trying to do
+      description: The diagram or workflow you wanted, and where the current tools stopped you.
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What you did instead
+      description: The workaround, if you found one. These are the most useful part of the report.

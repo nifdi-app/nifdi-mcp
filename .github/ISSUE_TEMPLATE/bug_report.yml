@@ -1,0 +1,56 @@
+name: Bug report
+description: Something the server did wrong.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you asked for, what the server did, and what you expected instead.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: "0.1.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options:
+        - local (files on disk)
+        - cloud (hosted bridge)
+        - not sure
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: MCP client
+      placeholder: "Claude Code 2.x, Cursor, custom…"
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: OS and Node version
+      placeholder: "macOS 15.4, Node 22.11"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Tool calls that reproduce it
+      description: >
+        The sequence of tool calls, and the diagram XML if the problem is with a particular
+        diagram. Redact anything you would not publish.
+      render: xml
+  - type: textarea
+    id: logs
+    attributes:
+      label: Server output
+      description: Anything the server printed on stderr.
+      render: shell

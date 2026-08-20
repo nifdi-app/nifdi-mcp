@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: nifdi
+    url: https://nifdi.app
+    about: What nifdi is, and the browser editor.
+  - name: Skills and plugin (open source)
+    url: https://github.com/nifdi-app/nifdi-plugin/issues
+    about: Issues with the Agent Skills, the plugin manifest, or their examples.
