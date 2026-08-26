@@ -4,6 +4,12 @@ Notable changes to `@nifdi/mcp`. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.1.3
+
+### Changed
+
+- Cleaned up the README.
+
 ## 0.1.2
 
 ### Changed
