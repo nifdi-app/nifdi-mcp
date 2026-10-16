@@ -4,6 +4,77 @@ Notable changes to `@nifdi/mcp`. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the package uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.0
+
+### Changed
+
+- A saved diagram embeds the WOFF2 subsets its text actually uses, rather than whole TrueType
+  faces: only the unicode ranges the diagram's codepoints fall in, one rule per distinct file, and
+  one file shared across the weights that use it in a variable family. Files get smaller — the
+  schematic in the README went from 147,787 to 82,821 bytes — and they still open with the exact
+  faces their geometry was measured against on a machine with neither nifdi nor a network. A face
+  whose web files could not be had embeds its TrueType bytes instead, so a file never names a face
+  it carries no bytes for.
+- Text is markdown: several paragraphs, headings, bullet and numbered lists, code blocks, bold,
+  italic and inline code in one text block. That holds for `set_text` content, for `<text>` in
+  `insert` and `set_diagram` XML, and for the text already in a file. `set_text` asks for the bold
+  and monospace faces the content needs before it edits, so a heading or a code span refuses up
+  front rather than failing mid-edit.
+- Existing text is read as markdown with no escaping, so a diagram saved by an earlier version whose
+  text holds `*`, `_` or backticks, or a line starting `#`, `- ` or `1. `, draws differently when
+  opened.
+- Multi-line text is saved with `xml:space="preserve"` and read back exactly. A `<text>` without it
+  is trimmed and its continuation lines dedented, so hand-indented XML reads as the text it means.
+- Fira Mono is a canonical family: code spans and code blocks are drawn in it, and startup and
+  `fetch-assets --fonts` download it beside the others.
+- `fetch-assets --fonts` takes family names: `nifdi-mcp fetch-assets --fonts "DM Sans" Cardo`
+  (or `"DM Sans,Cardo"`) puts any Google Fonts family into the store at every weight it advertises,
+  which is how a machine that will run with `NIFDI_OFFLINE=true` is given a family beyond the
+  canonical set. A name that is not a Google Fonts family is listed as not fetched and the command
+  exits non-zero; faces left without web files are listed too.
+- `render`, `textconv` and `merge` install any missing canonical faces before they run, as the
+  server does at startup. A git diff or merge driver can therefore reach the network on first use,
+  unless `NIFDI_OFFLINE=true`, and reports missing assets on stderr.
+- Opening a diagram repairs geometry that cannot be resized: fractional coordinates move onto whole
+  pixels, and fractional border widths and margins round up. Centring puts an odd pixel on the high
+  side everywhere. A file saved by an earlier version can therefore shift by a pixel when opened and
+  saved.
+- A file whose icon colour is anything but `natural` or a hex colour, or whose font family is not a
+  valid family name, is refused on open rather than drawn.
+- `connect` takes explicit connector pairs instead of a list of block ids. `connections` is a list of
+  `{from, to}` pairs, and each pair becomes one connector pointing from `from` to `to`. An end is
+  `{block}`, which leaves routing to choose the side and choose again when the block moves, or
+  `{block, attach: "left" | "right" | "top" | "bottom"}`, which pins that side. These are the same
+  two kinds of end a `<path>` carries in `get_diagram` (`current=` and `attach=`). A pair is always
+  added, even between blocks that are already joined, and the summary says when that happened.
+- `connect` takes style. `style` sets path declarations such as
+  `path-colour: #64748b; line-style: dashed` on every connector the call creates. A connection's own
+  `style` sets them on that connector only and wins where the two overlap. Both use `set_style`'s
+  path vocabulary, report skipped declarations the same way, and keep their values on the connectors
+  they name. When either is given, the result carries `applied` and `skips` as `set_style`'s does.
+- A new connector with no style of its own takes the look the diagram's connectors share, the
+  `path {}` rule in `get_diagram`. Before, every connector came out black with a triangle arrowhead,
+  whatever that rule said.
+- `pathIds` in the `connect` result lines up with `connections`: one id per pair, or `null` for a
+  pair that could not be routed, which the summary names.
+
+### Removed
+
+- Cloud and workspace modes. The server no longer reads `NIFDI_BRIDGE_URL`, `NIFDI_AGENT_TOKEN`,
+  `NIFDI_WORKSPACE_TOKEN` or `NIFDI_MCP_MODE`, and the agent tokens those modes took are no longer
+  issued. `@nifdi/mcp` works on local `.nifdi.svg` files only. To work on diagrams stored in the
+  nifdi cloud, add the hosted server instead, which signs in with OAuth:
+  `claude mcp add --transport http nifdi https://nifdi.app/api/mcp`.
+- The `add_font` tool. A font is no longer something an agent supplies to a server: every face a
+  diagram names comes from the per-user asset store that `nifdi-mcp fetch-assets --fonts` fills, and
+  a face that is not there is refused by name, pointing at that command, rather than being drawn in
+  Inter. The `.nifdi/fonts` sidecar a supplied font was kept in is gone with it, so a workspace
+  holds history and nothing else.
+- `connect`'s `ids` and `mode` parameters: the `"auto"` ranking into rows and columns, and
+  `"chain"`. To get a chain or a fan-out, list its pairs.
+- The `new-line-behaviour` style property, with the one-block-per-line text model it governed.
+  Files whose `<style>` names it still load, and the declaration is skipped with a warning.
+
 ## 0.2.0
 
 ### Changed
